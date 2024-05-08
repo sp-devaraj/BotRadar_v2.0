@@ -49,7 +49,9 @@ namespace BotRadar_v2._0
 
         private static List<string> ExtractSearchResults(IWebDriver driver)
         {
+            var allHashmap = new HashSet<string>();
             var allLinks = new List<string>();
+            String tLink;
             try
             {
               //  var nextButton = driver.FindElement(By.XPath("//span[text()='More Results']")); // Common next button selector
@@ -60,11 +62,23 @@ namespace BotRadar_v2._0
                     var links = driver.FindElements(By.TagName("a"));
                     foreach (var link in links)
                     {
-                        allLinks.Add(link.GetAttribute("href"));
+                        tLink = link.GetAttribute("href");
+
+                        try
+                        {
+                            if (tLink != null && tLink.IndexOf("google.com") <= 0)
+                            {
+                                allHashmap.Add(tLink);
+                                allLinks.Add(tLink);
+                            }
+                        }
+                        catch {  }
+
+
                     }
 
                     // Click next button and wait for page to load
-                  //  nextButton.Click();
+                    //  nextButton.Click();
                     new WebDriverWait(driver, TimeSpan.FromSeconds(1)).Until(d => d.Title != "");
                     
                     // Check for next button again
@@ -73,6 +87,7 @@ namespace BotRadar_v2._0
             }
             catch { }
 
+            
             return allLinks;
         }
 
