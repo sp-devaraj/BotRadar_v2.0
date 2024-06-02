@@ -54,7 +54,7 @@ namespace BotRadar_v2._0
             String tLink;
             try
             {
-              //  var nextButton = driver.FindElement(By.XPath("//span[text()='More Results']")); // Common next button selector
+                var nextButton = driver.FindElement(By.XPath("//span[text()='More Results']")); // Common next button selector
 
                 while (listenBrowser == true)
                 {
@@ -73,8 +73,6 @@ namespace BotRadar_v2._0
                             }
                         }
                         catch {  }
-
-
                     }
 
                     // Click next button and wait for page to load

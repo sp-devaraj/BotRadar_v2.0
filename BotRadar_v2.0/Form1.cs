@@ -57,11 +57,24 @@ namespace BotRadar_v2._0
 
             }
         }
-
+        Bing_ResultsCrawler bingCrawler;
         private void googleSearchToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BotCrawler.PullSearchResults("site:mashreq.com");
+        }
+
+        private void startToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            bingCrawler = new Bing_ResultsCrawler("site:infosys.com -site:www.infosys.com", "infosys.com");
+            bingCrawler.PullSearchResults();
             MessageBox.Show("Done!");
+        }
+
+        private void continueToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(bingCrawler != null)
+                bingCrawler.PullSearchResults();
+            MessageBox.Show("Done!");
+
         }
     }
 }
