@@ -51,7 +51,7 @@ namespace BotRadar_v2._0
                 List<String> fs = File.ReadLines( fname ).ToList();
                 foreach( String line in fs )
                 {
-                    listView1.Items.Add(line);
+                    //listView1.Items.Add(line);
                 }
                 
 
@@ -64,9 +64,7 @@ namespace BotRadar_v2._0
 
         private void startToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            bingCrawler = new Bing_ResultsCrawler("site:infosys.com -site:www.infosys.com", "infosys.com");
-            bingCrawler.PullSearchResults();
-            MessageBox.Show("Done!");
+
         }
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e)
@@ -75,6 +73,19 @@ namespace BotRadar_v2._0
                 bingCrawler.PullSearchResults();
             MessageBox.Show("Done!");
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            bingCrawler = new Bing_ResultsCrawler(textBox1.Text, textBox2.Text);
+            bingCrawler.PullSearchResults();
+            MessageBox.Show("Done!");
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            bingCrawler.PullSearchResults();
+            MessageBox.Show("Done!");
         }
     }
 }
