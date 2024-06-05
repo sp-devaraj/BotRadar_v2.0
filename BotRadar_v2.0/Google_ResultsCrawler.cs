@@ -189,7 +189,7 @@ namespace BotRadar_v2._0
 
                 try
                 {
-                    if (tLink != null && tLink.IndexOf(searchUrlFilter) > 0)
+                    if (tLink != null && tLink.IndexOf(searchUrlFilter) > 0 && tLink.IndexOf("google.com") == -1)
                     {
                         allUrlHashmap.Add(tLink);
                         allUrlLinks.Add(tLink);

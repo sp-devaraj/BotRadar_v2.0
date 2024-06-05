@@ -11,6 +11,8 @@ using OpenQA.Selenium.Support.UI;
 using static System.Net.WebRequestMethods;
 using System.Security.Policy;
 using System.Threading;
+using System.Collections;
+using System.Windows.Forms;
 
 namespace BotRadar_v2._0
 {
@@ -29,7 +31,8 @@ namespace BotRadar_v2._0
         string searchEndUrl = "";//"&sca_esv=be445f0cc062ab15&sxsrf=ADLYWIJbX2cqq4wyqVTSiBmRitn5TpXtfw:1715016452232&ei=BBM5ZpnmDYu3vr0Px4ez0Ag&start=100&sa=N&ved=2ahUKEwiZ-KyTxvmFAxWLm68BHcfDDIoQ8tMDegQIChAE&cshid=1715016540079012&biw=1366&bih=633&dpr=1";
         IWebDriver browserDriver = null;
 
-        HashSet<string> allUrlHashmap = new HashSet<string>();
+         HashSet<string> allUrlHashmap = new HashSet<string>();
+        //Hashtable allUrlHashmap = new Hashtable();
         List<string> allUrlLinks = new List<string>();
 
         public Bing_ResultsCrawler(string searchStr, string urlFilter)
@@ -127,22 +130,28 @@ namespace BotRadar_v2._0
         private bool IsNextSearchResultPageAvailable()
         {
             bool isNextExist = false;
-            // var nextButton = browserDriver.FindElement(By.XPath("//a//h3//div//span[text()='More Results']")); // Common next button selector
-            var links = browserDriver.FindElements(By.TagName("a"));
             string tname = string.Empty;
             string tlink = string.Empty;
             IWebElement nextButton = null;
-            foreach (var link in links)
-            {
-                tlink = link.GetAttribute("href");
-                tname = link.GetAttribute("title"); 
-                if (tlink != null && tlink.IndexOf("/search?q=") >= 0 && tname.IndexOf("Next page") >= 0)
-                {
-                    nextButton = link;
-                    break;
-                }
 
+            try
+            {
+                // var nextButton = browserDriver.FindElement(By.XPath("//a//h3//div//span[text()='More Results']")); // Common next button selector
+                var links = browserDriver.FindElements(By.TagName("a"));
+                foreach (var link in links)
+                {
+                    tlink = link.GetAttribute("href");
+                    tname = link.GetAttribute("title");
+                    if (tlink != null && tlink.IndexOf("/search?q=") >= 0 && tname.IndexOf("Next page") >= 0)
+                    {
+                        nextButton = link;
+                        break;
+                    }
+
+                }
             }
+            catch { }
+
             if (nextButton != null)
             {
                 isNextExist = true;
@@ -189,11 +198,12 @@ namespace BotRadar_v2._0
             var links = browserDriver.FindElements(By.TagName("a"));
             foreach (var link in links)
             {
-                tLink = link.GetAttribute("href");
-
                 try
                 {
-                    if (tLink != null && tLink.IndexOf(searchUrlFilter) > 0)
+
+                    tLink = link.GetAttribute("href");
+                if (tLink != null ) tLink = tLink.Trim().ToLower();
+                if (tLink != null && tLink.IndexOf(searchUrlFilter) > 0 && tLink.IndexOf("bing.com") == -1 && !IsLinkAlreadyPresent(tLink))
                     {
                         allUrlHashmap.Add(tLink);
                         allUrlLinks.Add(tLink);
@@ -225,8 +235,11 @@ namespace BotRadar_v2._0
                         {
                             if (tLink != null && tLink.IndexOf("google.com") <= 0)
                             {
-                                allHashmap.Add(tLink);
-                                allLinks.Add(tLink);
+                                if (!IsLinkAlreadyPresent(tLink))
+                                {
+                                    allHashmap.Add(tLink);
+                                    allLinks.Add(tLink);
+                                }
                             }
                         }
                         catch { }
@@ -246,16 +259,33 @@ namespace BotRadar_v2._0
             return allLinks;
         }
 
+        private bool IsLinkAlreadyPresent(string link)
+        {
+            bool isPresent = false;
+            foreach (string str in allUrlLinks)
+            {
+                if (str.Equals(link))
+                { isPresent = true; break; }
+            }
+            return isPresent;
+
+        }
+
         private void WriteResultsToCsv(List<string> allLinks)
         {
-            using (var writer = new StreamWriter(outputFile))
+            string fname = searchUrlFilter.ToString() + "_" + DateTime.Now.Ticks.ToString() + "_" + outputFile;
+            using (var writer = new StreamWriter(fname))
             {
                 writer.WriteLine("Link");
                 foreach (var link in allLinks)
                 {
                     writer.WriteLine(link);
                 }
+                writer.Flush();
+                writer.Close();
+
             }
+
         }
 
     }

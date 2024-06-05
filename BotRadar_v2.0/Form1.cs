@@ -87,5 +87,36 @@ namespace BotRadar_v2._0
             bingCrawler.PullSearchResults();
             MessageBox.Show("Done!");
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+           if (openFileDialog1.ShowDialog() == DialogResult.OK )
+            {
+                FileStream fs = File.OpenRead( openFileDialog1.FileName );
+                StreamReader sr = File.OpenText(openFileDialog1.FileName);
+                string str = string.Empty;
+                int ctr = 0;
+                while (!sr.EndOfStream)
+                {
+                    str = sr.ReadLine();
+                    string []strs = str.Split('#');
+                    listView1.Items.Insert(ctr++, str);
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < listView1.Items.Count; i++)
+            {
+                string str = listView1.Items[i].Text;
+                string[] strs = str.Split('#');
+               // MessageBox.Show(strs[0] + " " + strs[1]);
+              
+                bingCrawler = new Bing_ResultsCrawler(strs[0].Trim().ToLower(), strs[1].Trim().ToLower());
+                bingCrawler.PullSearchResults();
+            }
+            MessageBox.Show("Done!!");
+        }
     }
 }
