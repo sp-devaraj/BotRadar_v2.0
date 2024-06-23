@@ -69,22 +69,25 @@ namespace BotRadar_v2._0
 
         private void continueToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string fName = "url_list.csv";
             if(bingCrawler != null)
-                bingCrawler.PullSearchResults();
+                bingCrawler.PullSearchResults(fName);
             MessageBox.Show("Done!");
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            string fName = "url_list.csv";
             bingCrawler = new Bing_ResultsCrawler(textBox1.Text, textBox2.Text);
-            bingCrawler.PullSearchResults();
+            bingCrawler.PullSearchResults(fName);
             MessageBox.Show("Done!");
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            bingCrawler.PullSearchResults();
+            string fName = "url_list.csv";
+            bingCrawler.PullSearchResults(fName);
             MessageBox.Show("Done!");
         }
 
@@ -107,14 +110,23 @@ namespace BotRadar_v2._0
 
         private void button4_Click(object sender, EventArgs e)
         {
+            String fName = "combined_urls.csv";
             for (int i = 0; i < listView1.Items.Count; i++)
             {
                 string str = listView1.Items[i].Text;
                 string[] strs = str.Split('#');
-               // MessageBox.Show(strs[0] + " " + strs[1]);
-              
-                bingCrawler = new Bing_ResultsCrawler(strs[0].Trim().ToLower(), strs[1].Trim().ToLower());
-                bingCrawler.PullSearchResults();
+                // MessageBox.Show(strs[0] + " " + strs[1]);
+                if (i == 0)
+                {
+                    bingCrawler = new Bing_ResultsCrawler(strs[0].Trim().ToLower(), strs[1].Trim().ToLower());
+                    bingCrawler.PullSearchResults(fName);
+                }else
+                {
+                    bingCrawler.searchString = strs[0].Trim();
+                    bingCrawler.searchUrlFilter = strs[1].Trim();
+                    bingCrawler.searchUrl = bingCrawler.searchStartUrl + bingCrawler.searchString + bingCrawler.searchEndUrl;
+                    bingCrawler.PullSearchResults(fName);
+                }
             }
             MessageBox.Show("Done!!");
         }

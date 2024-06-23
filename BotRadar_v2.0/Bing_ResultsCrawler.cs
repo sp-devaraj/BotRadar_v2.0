@@ -13,22 +13,23 @@ using System.Security.Policy;
 using System.Threading;
 using System.Collections;
 using System.Windows.Forms;
+using System.Net.NetworkInformation;
 
 namespace BotRadar_v2._0
 {
     public class Bing_ResultsCrawler
     {
-        string searchString;
-        string searchUrlFilter;
+        public string searchString;
+        public string searchUrlFilter;
         string baseFolder = "./output/";
         string outputFolder = string.Empty;
         string outputFile = "search_results.csv";
         string SE_GOOGLE = "Google";
         bool listenBrowser = true;
-        
-        string searchUrl = string.Empty;
-        string searchStartUrl = "https://www.bing.com/search?q=";
-        string searchEndUrl = "";//"&sca_esv=be445f0cc062ab15&sxsrf=ADLYWIJbX2cqq4wyqVTSiBmRitn5TpXtfw:1715016452232&ei=BBM5ZpnmDYu3vr0Px4ez0Ag&start=100&sa=N&ved=2ahUKEwiZ-KyTxvmFAxWLm68BHcfDDIoQ8tMDegQIChAE&cshid=1715016540079012&biw=1366&bih=633&dpr=1";
+
+        public string searchUrl = string.Empty;
+        public string searchStartUrl = "https://www.bing.com/search?q=";
+        public string searchEndUrl = "";//"&sca_esv=be445f0cc062ab15&sxsrf=ADLYWIJbX2cqq4wyqVTSiBmRitn5TpXtfw:1715016452232&ei=BBM5ZpnmDYu3vr0Px4ez0Ag&start=100&sa=N&ved=2ahUKEwiZ-KyTxvmFAxWLm68BHcfDDIoQ8tMDegQIChAE&cshid=1715016540079012&biw=1366&bih=633&dpr=1";
         IWebDriver browserDriver = null;
 
          HashSet<string> allUrlHashmap = new HashSet<string>();
@@ -51,7 +52,7 @@ namespace BotRadar_v2._0
             // Initialize WebDriver (replace with path to your ChromeDriver)
             browserDriver = new ChromeDriver();
         }
-        public void PullSearchResults()
+        public void PullSearchResults(String fName)
         {
 
             OpenSearchPage();
@@ -71,12 +72,12 @@ namespace BotRadar_v2._0
             // driver.Quit();
 
             // Write results to CSV file
-           WriteResultsToCsv(allUrlLinks);
-
+           WriteResultsToCsv(allUrlLinks, fName);
+            allUrlLinks.Clear();
             Console.WriteLine($"Search results saved to: {outputFile}");
         }
 
-        public void PullSearchResultsInExistingBrowser()
+        public void PullSearchResultsInExistingBrowser(String fName)
         {
 
             GotoEndOfPage();
@@ -95,7 +96,7 @@ namespace BotRadar_v2._0
             // driver.Quit();
 
             // Write results to CSV file
-            WriteResultsToCsv(allUrlLinks);
+            WriteResultsToCsv(allUrlLinks, fName);
 
             Console.WriteLine($"Search results saved to: {outputFile}");
         }
@@ -271,12 +272,23 @@ namespace BotRadar_v2._0
 
         }
 
-        private void WriteResultsToCsv(List<string> allLinks)
+        private void WriteResultsToCsv(List<string> allLinks, string fileName)
         {
-            string fname = searchUrlFilter.ToString() + "_" + DateTime.Now.Ticks.ToString() + "_" + outputFile;
-            using (var writer = new StreamWriter(fname))
+            string fname; StreamWriter writer;
+            if (string.IsNullOrEmpty(fileName))
             {
-                writer.WriteLine("Link");
+
+                fname = searchUrlFilter.ToString() + "_" + DateTime.Now.Ticks.ToString() + "_" + outputFile;
+            }
+            else
+            {
+                fname = fileName;
+            }
+           
+            writer = new StreamWriter(fname, true);
+            using (writer)
+            {
+             //   writer.WriteLine("Link");
                 foreach (var link in allLinks)
                 {
                     writer.WriteLine(link);
